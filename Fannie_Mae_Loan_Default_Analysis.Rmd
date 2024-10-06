@@ -1,0 +1,241 @@
+---
+title: "Analysis of factors affecting Fannie Mae loan defaults"
+author: Anwesha Mohanty
+format: html
+output: bookdown::html_document2
+toc: false
+editor: visual
+---
+
+```{=html}
+<!This block assists in formatting the title, font size, chart caption, etc.– –>
+<style type="text/css">
+  .title {
+    text-align: left;
+}
+body{ /* Normal  */
+      font-size: 16px;
+      margin: 2.5cm;
+      top: 1.5cm;
+      text-align: justify;
+  }
+  .caption {
+    font-size: big;
+    text-align: center;
+    position: above;
+}
+</style>
+```
+```{css plotly-caption, echo = FALSE}
+/*Include this block if you like the chart caption at the top instead of the bottom.*/
+div.figure {
+  display: table;
+}
+div.figure p {
+  display: table-caption;
+  caption-side: top;
+}
+```
+
+------------------------------------------------------------------------
+
+### Introduction {.unnumbered}
+
+The Federal National Mortgage Association(FNMA), popularly called Fannie Mae is one of the largest players in the mortgage and mortgage backed securities in the USA. In the years leading up to 2008, Fannie Mae suffered severe losses due to high volume of loan defaults. The loan performance data from Fannie Mae serves as an important resource for businesses and investors to understand the factors that lead to loan defaults.
+
+In this report, I have analyzed some features that are potentially significant factors that could lead to a loan being defaulted by the borrower. Specifically, I have examined these features from a lender's perspective. What are some key metrics should banks or financial organizations look for when giving out money on loan? What can be said about credit scores, income and other factors of borrowers and how are they correlated to loan defaults? Let's examine in the following report.
+
+### Loan to Value Ratio analysis {.unnumbered}
+
+In simple terms, the loan to value(LTV) ratio is a measure of how 'risky' you are as a borrower. LTV is calculated as the ratio of amount borrowed to the value of the property on mortgage. Higher LTV ratios indicate more chances of defaulting on the loan.
+
+To understand the distribution of LTV in the fourth quarter of years 2007 and 2019, let's look at histograms in Figure \@ref(fig:ltv-hist-2007) and Figure \@ref(fig:ltv-hist-2019).
+
+From the histogram for 2007, it is seen that most borrowers had Loan to value ratios in the range 70 to 80, which is typically a high number. The distribution is right skewed and has a median at 77. Similarly, for 2019, the histogram is also right skewed with median at 75. The distribution for 2007 is significantly less number of borrowers with LTV in other lower ranges, while in the histogram of 2019, we can see that there are significant number of borrowers in each LTV bin. Thus, it is clear that in 2007, loans had a higher chance of defaults than in 2019.
+
+### Loan Purpose and Default Rates {.unnumbered}
+
+Next, we examine the loan purpose and analyze the purpose category which has most defaults.
+
+In the chart Figure \@ref(fig:purpose-bar), the loans for the purpose of 'refinance' has the highest rate of defaults in 2007. This trend is however different in 2019, with loans for 'purchase' have the highest default rates. However, the thing to note is that the number of defaults is significantly lower in 2019 as compared to 2007. This shows that the economic conditions have stabilized over the years from 2007 to 2019.
+
+### Credit score Analysis {.unnumbered}
+
+Since credit score is a key factor when getting a loan, I have grouped the credit scores of borrowers into 5 categories - 'Poor', 'Fair', 'Good','Very Good', 'Exceptional'. For each category, I have calculated default rates to show that those with lower credit scores are more likely to default on loans. This is shown in Figure \@ref(fig:credit-score).
+
+### Debt to Income Ratio Analysis {.unnumbered}
+
+Debt to Income(DTI) ratio is a metric that compares your monthly debt payments to your monthly income. A lower DTI is an indicator of a better balance between debt and income. Hence, lenders prefer those borrowers who have a lower DTI since they are less likely to default.
+
+To understand distribution of the DTI in the years 2007 and 2019, I have created two boxplots in Figure \@ref(fig:box-plot) . We can see that the DTI in 2007 was much more spread out over a large range of values, with a median at 39. But the distribution of DTI in 2019 has much less variance and a median at 36.
+
+### Conclusion {.unnumbered}
+
+From the analysis above, we found that economic conditions have become much more stabilized from 2007 to 2019. Borrowers have shown very little default rates in 2019 compared to that in 2007. We found that the factors like Loan to Value ratio, debt to income ratio, credit score are important indicators for banks to take into account when giving out loans, since these factors are directly related to default of loans.
+
+(Word count: 668 words)
+
+### Figure Appendix {.unnumbered}
+
+```{r, include = FALSE}
+library(tidyverse)
+library(scales)
+library(ggplot2)
+library(plotly)
+fm_2007 <- read_rds("data_sample_2007Q4.rds")
+fm_2019 <- read_rds("data_sample_2019Q4.rds")
+```
+
+```{r ltv-hist-2007, echo = FALSE, fig.width=10, fig.height = 4, fig.cap="Histogram of Loan to value 2007"}
+fm_2007 %>%
+ggplot(aes(x=OLTV)) + # For histogram, we only need to define x-axis
+  geom_histogram(breaks=seq(10,100,10), fill="lightblue", color="white") + # fill: filled color; color: border color
+  scale_x_continuous(breaks = seq(10,100,10), labels =seq(10,100,10) )+
+  labs(title="The distribution of Original Loan to Value is right skewed with a median at 77",
+       caption = "Data: Fannie Mae loan data 2007(Q4)",
+       x="Original Loan to Value Ratio", y="Frequency") +
+  theme_classic() +
+  theme(axis.ticks = element_blank(), 
+        plot.caption = element_text(face="italic"),
+        plot.title = element_text(size=13),
+        panel.grid.major.y = element_line(color="grey95"))
+```
+
+<br>
+
+```{r ltv-hist-2019, echo = FALSE,warning=FALSE,message=FALSE, fig.width=10, fig.height = 4, fig.cap="Histogram of Loan to value 2019"}
+fm_2019 %>%
+ggplot(aes(x=OLTV)) +
+  geom_histogram(breaks=seq(10,100,10), fill="lightblue", color="white") + # fill: filled color; color: border color
+  scale_x_continuous(breaks = seq(10,100,10), labels =seq(10,100,10) )+
+  labs(title="The distribution of Original Loan to Value is right skewed with a median at 75",
+       caption = "Data: Fannie Mae loan data 2019(Q4)",
+       x="Original Loan to Value Ratio", y="Frequency") +
+  theme_classic() +
+  theme(axis.ticks = element_blank(), # remove ticks
+        plot.caption = element_text(face="italic"),
+        plot.title = element_text(size=13),
+        panel.grid.major.y = element_line(color="grey95"))
+
+```
+
+```{r , include = FALSE,warning=FALSE,message=FALSE}
+fm_2007 %>%
+  group_by(PURPOSE) %>%
+  summarise(count = n())
+
+fm_2019 %>%
+  group_by(PURPOSE) %>%
+  summarise(count = n())
+
+```
+
+```{r , include = FALSE,warning=FALSE,message=FALSE}
+fm_2007 <- fm_2007 %>%
+  mutate(YEAR = 2007)
+
+fm_2019 <- fm_2019 %>%
+  mutate(YEAR = 2019)
+
+merged_fm <- rbind(fm_2007, fm_2019)
+```
+
+```{r purpose-bar, echo = FALSE,include=FALSE, warning=FALSE,message=FALSE, fig.width=10, fig.height = 4, fig.cap="bar chart of loan purpose"}
+data_bar_chart <- merged_fm %>%
+  group_by(YEAR,PURPOSE) %>%
+  summarise(default_rate = mean(DEFAULT_FLAG))
+
+data_bar_chart
+```
+
+```{r purpose-bar ,echo=FALSE,fig.cap="Purpose vs loan default",fig.width=10, warning=FALSE,message=FALSE}
+data_bar_chart %>%
+  ggplot(aes(x=as.factor(YEAR), y=default_rate*100, fill = PURPOSE)) +
+  geom_col(width=0.7, position="dodge")+
+  labs(y = "Default Rate(%)",
+       x = "") +
+   geom_text(aes( y = default_rate, label = round(default_rate*100,2)), position = position_dodge(0.7)) +
+  theme_minimal() +
+  theme(axis.title.x = element_text(face="bold"), 
+        axis.text = element_text(face="bold",size=10),
+        legend.position="bottom",
+        legend.margin = margin(t=-15),
+        plot.caption = element_text(face="italic"),
+        plot.title = element_text(size=14),
+        panel.grid.minor = element_blank(), 
+        panel.grid.major.y = element_line(color="grey90"),
+        panel.grid.major.x = element_blank()) +
+  scale_fill_brewer(name="",palette ="Set3") 
+```
+
+```{r, include= FALSE}
+merged_fm <- merged_fm %>%
+  mutate(CSCORE_Category = case_when(
+    CSCORE_B < 500 ~ "Poor",
+    CSCORE_B >= 500 & CSCORE_B <= 669 ~ "Fair",
+    CSCORE_B >= 670 & CSCORE_B <= 740 ~ "Good",
+    CSCORE_B >= 740 & CSCORE_B <= 799 ~ "Very Good",
+    CSCORE_B >= 800 ~ "Exceptional"
+  ),
+  CSCORE_Category = as.factor(CSCORE_Category))
+```
+
+```{r, include= FALSE}
+merged_fm %>%
+  group_by(CSCORE_Category) %>%
+  summarise(count = n())
+```
+
+```{r, include= FALSE, message= FALSE}
+data_cscore <- merged_fm %>%
+  drop_na(CSCORE_Category)%>%
+  group_by(YEAR, CSCORE_Category) %>%
+  summarise(count_of_defaults = sum(DEFAULT_FLAG),
+            default_rate  = (sum(DEFAULT_FLAG)/n())*100)
+  
+data_cscore
+```
+
+```{r credit-score, message= FALSE,warning=FALSE, echo = FALSE, fig.cap="Credit score by category",fig.width=10}
+y <- data_cscore %>%
+  ggplot(aes(x=as.factor(YEAR), y=default_rate,fill= CSCORE_Category)) +
+  geom_col(width=0.7,position="dodge")+
+  labs(y = "Default rate(%)",
+       x = "",
+       fill = "Credit Score Category") +
+  geom_text(aes(label = scales::percent(round(default_rate,3))), size = 3, 
+            position =position_dodge(0.7)) +
+  theme_minimal() +
+  theme(axis.title.x = element_text(face="bold"), 
+        axis.text = element_text(face="bold",size=10),
+        legend.position="bottom",
+        legend.margin = margin(t=-15),
+        plot.caption = element_text(face="italic"),
+        plot.title = element_text(size=14),
+        panel.grid.minor = element_blank(), 
+        panel.grid.major.y = element_line(color="grey90"),
+        panel.grid.major.x = element_blank()) 
+  scale_fill_brewer(name="",palette ="Set2")
+  
+ggplotly(y,tooltip = c("default_rate","count_of_defaults"))
+```
+
+```{r box-plot, warning = FALSE,echo = FALSE, message=FALSE,fig.cap="DTI distribution of defaulters",fig.width=10}
+merged_fm %>%
+  filter(DEFAULT_FLAG == 1) %>%
+  ggplot(aes(x= as.factor(YEAR), y =DTI, col = as.factor(YEAR))) +
+  geom_jitter(width = 0.05, color="grey90", alpha=0.7, stroke=NA, size=2)+
+  geom_boxplot(aes(fill = DTI)) +
+  geom_boxplot(alpha =0.8,outlier.color=NA) +
+  labs(x="Year", y="Debt to Income Ratio", col="Year")+
+  theme_minimal()+
+  theme(axis.ticks = element_blank(),
+        legend.position = "bottom",
+        axis.title.x = element_text(face="bold",margin=margin(t=10)),
+        plot.caption = element_text(face="italic"),
+        plot.title = element_text(size=10),
+        panel.grid.major.y = element_line(color='grey90'))
+scale_color_brewer(palette = "Paired")
+
+  
+```
